@@ -1,5 +1,6 @@
 integrations:
   - name: nri-flex
+    interval: 60s
     config:
       name: pingCheck
       lookup_file: ips.json

@@ -1,6 +1,6 @@
 # New Relic Flex Integration: Ping Check
 
-This repository contains two files that work with the New Relic Flex integration: `pingCheck.yml` and `ips.json`. These files need to be placed inside the integrations folder on any server that has the New Relic Infrastructure agent installed.
+This repository contains two files that work with the New Relic Flex integration: `pingCheck.yml` and `ips.json`. These files need to be placed inside the integrations folder on any server that has the [New Relic Infrastructure agent installed.](https://docs.newrelic.com/docs/infrastructure/introduction-infra-monitoring/)
 
 ## Installation
 
@@ -72,7 +72,7 @@ integrations:
                     [packetsTransmitted, packetsReceived, packetLoss, timeMs]
 ```
 
-## Example output
+## Example output from FLEX
 
 ```json
 {
@@ -129,5 +129,79 @@ integrations:
       "events": []
     }
   ]
+}
+```
+
+## Example Alert Condition in Terraform
+
+```sql
+resource "newrelic_nrql_alert_condition" "cctv_ping_check_condition" {
+  account_id = <Your Account ID>
+  policy_id = <Your Policy ID>
+  type = "static"
+  name = "CCTV Ping Check Condition"
+  enabled = true
+  violation_time_limit_seconds = 259200
+
+  nrql {
+    query = "FROM pingCheck SELECT latest(packetLoss) FACET deviceName, deviceAddr "
+  }
+
+  critical {
+    operator = "above"
+    threshold = 0
+    threshold_duration = 60
+    threshold_occurrences = "all"
+  }
+  fill_option = "none"
+  aggregation_window = 60
+  aggregation_method = "event_flow"
+  aggregation_delay = 120
+}
+
+
+```
+
+## Example Alert Condition in GraphQL
+
+```sql
+mutation {
+  alertsNrqlConditionStaticCreate(
+    accountId: <Your Account ID>
+    policyId: <Your Policy ID>
+    condition: {
+      enabled: true
+      name: "CCTV Ping Check Condition"
+      description: null
+      titleTemplate: null
+      nrql: {
+        query: "FROM pingCheck SELECT latest(packetLoss) FACET deviceName, deviceAddr "
+      }
+      expiration: null
+      runbookUrl: null
+      signal: {
+        aggregationWindow: 60
+        fillOption: NONE
+        aggregationDelay: 120
+        aggregationMethod: EVENT_FLOW
+        aggregationTimer: null
+        fillValue: null
+        slideBy: null
+        evaluationDelay: null
+      }
+      terms: [
+        {
+          operator: ABOVE
+          threshold: 0
+          priority: CRITICAL
+          thresholdDuration: 60
+          thresholdOccurrences: ALL
+        }
+      ]
+      violationTimeLimitSeconds: 259200
+    }
+  ) {
+    id
+  }
 }
 ```

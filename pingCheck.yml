@@ -3,7 +3,7 @@ integrations:
     interval: 60s
     config:
       name: pingCheck
-      lookup_file: ips.json
+      lookup_file: /etc/newrelic-infra/integrations.d/ips.json
       apis:
         - event_type: pingCheck
           custom_attributes:

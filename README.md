@@ -14,11 +14,7 @@ Place the files in the following directory:
 
 ### For Windows:
 
-Place the files in the following directory:
-
-```
-C:\Program Files\New Relic\newrelic-infra\integrations.d\
-```
+This flex congif is only suitable for Linxu at this time.
 
 Further instructions can be found [here](https://docs.newrelic.com/docs/infrastructure/host-integrations/host-integrations-list/flex-integration-tool-build-your-own-integration/#installation).
 

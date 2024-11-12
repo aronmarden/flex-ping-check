@@ -1,22 +1,24 @@
 # New Relic Flex Integration: Ping Check
 
-This repository contains two files that work with the New Relic Flex integration: `pingCheck.yml` and `ips.json`. These files need to be placed inside the integrations folder on any server that has the [New Relic Infrastructure agent installed.](https://docs.newrelic.com/docs/infrastructure/introduction-infra-monitoring/)
+This repository contains two files that work with the [New Relic Flex integration](https://docs.newrelic.com/docs/infrastructure/host-integrations/host-integrations-list/flex-integration-tool-build-your-own-integration/): `pingCheck.yml` and `ips.json`. These files need to be placed inside the integrations folder on any server that has the [New Relic Infrastructure agent installed.](https://docs.newrelic.com/docs/infrastructure/introduction-infra-monitoring/)
 
 ## Installation
 
 ### For Linux:
 
-Place the files in the following directory:
+Ensure the [New Relic Infrastructure agent is installed.](https://docs.newrelic.com/docs/infrastructure/introduction-infra-monitoring/)
+
+Once the agent is installed, place the files in the following directory:
 
 ```
 /etc/newrelic-infra/integrations.d
 ```
 
+Further instructions can be found [here](https://docs.newrelic.com/docs/infrastructure/host-integrations/host-integrations-list/flex-integration-tool-build-your-own-integration/#installation).
+
 ### For Windows:
 
-This flex congif is only suitable for Linxu at this time.
-
-Further instructions can be found [here](https://docs.newrelic.com/docs/infrastructure/host-integrations/host-integrations-list/flex-integration-tool-build-your-own-integration/#installation).
+This flex config is only suitable for Linxu at this time. It is not hard to retrofit this for Windows.
 
 ## Usage
 
@@ -26,6 +28,12 @@ Further instructions can be found [here](https://docs.newrelic.com/docs/infrastr
 
 ```
 SELECT * FROM pingCheck
+```
+
+You can change the `pingCheck` name by modifying line 8 in the `pingCheck.yml` file:
+
+```
+        - event_type: pingCheck
 ```
 
 3. Create alerts based on the `packetLoss` attribute if it increases above 0. Alerting documentation can be found [here](https://docs.newrelic.com/docs/alerts/overview/).
@@ -50,17 +58,22 @@ SELECT * FROM pingCheck
 ```yaml
 integrations:
   - name: nri-flex
+    interval: 60s
     config:
       name: pingCheck
-      lookup_file: ips.json
+      lookup_file: /etc/newrelic-infra/integrations.d/ips.json
       apis:
         - event_type: pingCheck
+          custom_attributes:
+            deviceName: ${lf:name}
+            deviceAddr: ${lf:addr}
           commands:
             - run: ping -c 1 ${lf:addr} || true
               split_output: statistics ---
               regex_matches:
                 - expression: ([0-9]+\.?[0-9]+)\/([0-9]+\.?[0-9]+)\/([0-9]+\.?[0-9]+)\/([0-9]+\.?[0-9]+)
                   keys: [min, avg, max, stddev]
+                  ### there are two different variants for the packet statistics returned, below allows support for both
                 - expression: (\d+) packets transmitted, (\d+) packets received, (\S+)% packet loss
                   keys: [packetsTransmitted, packetsReceived, packetLoss]
                 - expression: (\d+) packets transmitted, (\d+) received, (\d+)% packet loss, time (\d+)

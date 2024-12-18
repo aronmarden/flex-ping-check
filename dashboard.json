@@ -28,7 +28,7 @@
                                 "accountIds": [
                                     1863519
                                 ],
-                                "query": "SELECT sum(packetLoss) \nFROM pingCheck \nFACET deviceName, deviceAddr"
+                                "query": "SELECT sum(packetLoss) \nFROM pingCheck \nFACET deviceName, deviceAddr \nLIMIT MAX"
                             }
                         ],
                         "platformOptions": {
@@ -74,7 +74,7 @@
                                 "accountIds": [
                                     1863519
                                 ],
-                                "query": "SELECT latest(packetLoss)\nFROM pingCheck \nFACET deviceName\nTIMESERIES MAX"
+                                "query": "SELECT latest(packetLoss)\nFROM pingCheck \nFACET deviceName\nTIMESERIES MAX \nLIMIT MAX"
                             }
                         ],
                         "nullValues": {
@@ -118,7 +118,7 @@
                                 "accountIds": [
                                     1863519
                                 ],
-                                "query": "SELECT latest(avg)\nFROM pingCheck \nFACET deviceName\nTIMESERIES MAX\nSINCE 1 hour ago"
+                                "query": "SELECT latest(avg)\nFROM pingCheck \nFACET deviceName\nTIMESERIES MAX\nSINCE 1 hour ago\nLIMIT MAX"
                             }
                         ],
                         "nullValues": {
